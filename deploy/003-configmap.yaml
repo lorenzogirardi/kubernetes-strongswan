@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: strongswanconfigmap
+  namespace: strongswan
+data:
+  ipsec.conf: |
+    config setup
+
+    conn %default
+        ikelifetime=12h
+        keylife=20m
+        rekeymargin=3m
+        keyingtries=1
+        keyexchange=ikev2
+        authby=secret
+        mobike=no
+        reauth=no
+        closeaction=restart
+
+    conn roadw
+        left=%any
+        leftsubnet=192.168.1.0/24
+        leftid=ETHZERO_HOME_VPN
+        leftauth=psk
+        rightauth=psk
+        rightauth2=xauth-pam
+        rightsourceip=172.16.17.0/29
+        esp=aes256-sha1!
+        ike=aes256-sha1-modp1024!
+        ikelifetime=24h
+        keylife=60m
+        keyexchange=ikev1
+        rekey = yes
+        auto=add 
+  xauth-pam.conf: |
+    xauth-pam {
+    load = yes
+    pam_service = ipsec
+    }
+  attr.conf: |
+    attr {
+    load = yes
+    split-include = 192.168.1.0/24
+    split-exclpude = 0.0.0.0/0
+    } 
+  ipsec: |
+    #%PAM-1.0
+    auth sufficient pam_ldap.so config=/etc/pam_ldap.conf
+    account sufficient pam_ldap.so config=/etc/pam_ldap.conf
+

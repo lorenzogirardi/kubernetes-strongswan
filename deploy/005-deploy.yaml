@@ -1,0 +1,83 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: strongswan
+  namespace: strongswan
+spec:
+  replicas: 1
+  strategy:
+    type: RollingUpdate
+  revisionHistoryLimit: 10
+  selector:
+    matchLabels:
+      app: strongswan
+  template:
+    metadata:
+      labels:
+        app: strongswan
+    spec:
+      containers:
+      - name: strongswan
+        image: lgirardi/strongswan:1.0
+        securityContext:
+          capabilities:
+            add:
+            - NET_ADMIN
+        ports:
+        - name: isakmp
+          containerPort: 500
+          protocol: UDP
+        - name: ipsec-nat-t
+          containerPort: 4500
+          protocol: UDP
+        volumeMounts:
+        - name: psk
+          mountPath: /etc/ipsec.secrets
+          subPath: psk
+          readOnly: true
+        - name: pamldap
+          mountPath: /etc/pam_ldap.conf
+          subPath: pamldap
+        - name: strongswan-attr
+          mountPath: /etc/strongswan.d/charon/attr.conf
+          subPath: attr.conf
+        - name: strongswan-xauth-pam
+          mountPath: /etc/strongswan.d/charon/xauth-pam.conf
+          subPath: xauth-pam.conf
+        - name: strongswan-ipsec
+          mountPath: /etc/pam.d/ipsec
+          subPath: ipsec
+        - name: strongswan-ipseconf
+          mountPath: /etc/ipsec.conf
+          subPath: ipsec.conf
+      volumes:
+        - name: strongswan-attr
+          configMap:
+            name: strongswanconfigmap
+            items:
+            - key: attr.conf
+              path: attr.conf
+        - name: strongswan-xauth-pam
+          configMap:
+            name: strongswanconfigmap
+            items:
+            - key: xauth-pam.conf
+              path: xauth-pam.conf
+        - name: strongswan-ipsec
+          configMap:
+            name: strongswanconfigmap
+            items:
+            - key: ipsec
+              path: ipsec
+        - name: strongswan-ipseconf
+          configMap:
+            name: strongswanconfigmap
+            items:
+            - key: ipsec.conf
+              path: ipsec.conf
+        - name: psk
+          secret:
+            secretName: strongswan-secret
+        - name: pamldap
+          secret:
+            secretName: strongswan-secret

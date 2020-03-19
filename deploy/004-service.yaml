@@ -1,0 +1,20 @@
+kind: Service
+apiVersion: v1
+metadata:
+  namespace: strongswan
+  name: strongswan-service
+spec:
+  selector:
+    app: strongswan
+  ports:
+  - name: isakmp-udp
+    protocol: UDP
+    nodePort: 30500
+    port: 500
+    targetPort: 500
+  - name: ipsec-nat-t
+    protocol: UDP
+    nodePort: 30450
+    port: 4500
+    targetPort: 4500
+  type: NodePort
