@@ -260,7 +260,7 @@ charon (13) started after 80 ms
 12[IKE] maximum IKE_SA lifetime 86227s
 ```
 
-ok now i'm connected and i can see my network
+ok now i'm connected and i can see my network in tun0  
 
 ![android ip](https://res.cloudinary.com/ethzero/image/upload/c_scale,w_320/v1584730960/misc/strongswan_client_android.jpg)  
 
