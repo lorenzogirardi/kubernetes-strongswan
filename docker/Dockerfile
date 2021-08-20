@@ -1,4 +1,4 @@
-FROM debian:buster
+FROM debian:11
 MAINTAINER lgirardi <l@k8s.it>
 
 
